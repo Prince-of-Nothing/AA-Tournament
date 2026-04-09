@@ -4,27 +4,17 @@ def strategy(my_history, opponent_history):
     if n == 0:
         return 'D'
 
-    check_interval = 50
-    grace_period = 2
+    round_number = n + 1
 
-    # Every 50 rounds, use a cooperative check to probe the opponent.
-    if n % check_interval == 0:
+    # Every 50th round, defend.
+    if round_number % 50 == 0:
+        return 'D'
+
+    # Give the opponent two grace rounds after each defensive round.
+    if round_number % 50 in (1, 2):
         return 'C'
 
-    # After one of our checks, give the opponent two rounds of space
-    # before switching back to retaliation.
-    last_check_round = None
-    for round_index in range(n - 1, -1, -1):
-        if round_index % check_interval == 0 and my_history[round_index] == 'C':
-            last_check_round = round_index
-            break
-
-    if last_check_round is not None:
-        rounds_since_check = n - 1 - last_check_round
-        if rounds_since_check <= grace_period:
-            return 'C'
-
-    # Default behavior: cooperate unless the opponent defected recently.
+    # Otherwise, use tit for tat.
     if opponent_history[-1] == 'D':
         return 'D'
     return 'C'
